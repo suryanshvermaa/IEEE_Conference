@@ -1,0 +1,5 @@
+build
+config
+*.env
+./db_data
+./uploads
