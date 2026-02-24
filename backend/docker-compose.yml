@@ -11,5 +11,9 @@ services:
     volumes:
       - ./db_data:/var/lib/postgresql/data
       - ./sql:/docker-entrypoint-initdb.d
-  
-  
+    networks:
+      - ieee_network
+
+networks:
+  ieee_network:
+    driver: bridge
