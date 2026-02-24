@@ -3,3 +3,4 @@ build
 *.env
 ./db_data
 ./uploads
+/src/models/model.json
