@@ -11,5 +11,5 @@ class health : public drogon::HttpController<health>
     METHOD_ADD(health::healthController, "", Get);
 
     METHOD_LIST_END
-    void healthController(const HttpRequestPtr& req, std::function<void (const HttpResponsePtr &)> &&callback) const;
+    void healthController(const HttpRequestPtr& req, std::function<void (const HttpResponsePtr &)> &&callback);
 };

@@ -1,9 +1,13 @@
 #include<drogon/HttpAppFramework.h>
+#include <aws/core/Aws.h>
 #include"./utils/dotenv.hpp"
 #include"./config/database.h"
 using namespace drogon;
 
 int main(){
+    Aws::SDKOptions awsOptions;
+    Aws::InitAPI(awsOptions);
+
     Dotenv::load();
     const char* portEnv=std::getenv("PORT");
     app().loadConfigFile("./config/config.json");
@@ -42,5 +46,7 @@ int main(){
         }
     });
     app().run();
+
+    Aws::ShutdownAPI(awsOptions);
     return 0;
 }

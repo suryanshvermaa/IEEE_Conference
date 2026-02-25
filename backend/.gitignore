@@ -4,3 +4,4 @@ build
 ./db_data
 ./uploads
 /src/models/model.json
+/minio_data
