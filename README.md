@@ -1,40 +1,63 @@
-# IEEE Conference
+# IEEE Conference / IEEE IAS SBC – NIT Patna
 
-Official repository for the IEEE Conference website, including backend, frontend, infrastructure, and documentation.
+Official repository for the IEEE IAS Student Branch Chapter (NIT Patna).
 
-## Current Status
+## ✨ What’s in this repo
 
-- **Backend**: C++ (Drogon) service with PostgreSQL configuration.
-- **Frontend / Infra / Docs**: Placeholders for future development.
+- 🖥️ **Frontend**: React + Vite + TypeScript + Tailwind (in `frontend/`)
+- ⚙️ **Backend**: C++ (Drogon) API with PostgreSQL + MinIO (in `backend/`)
+- 📚 **Docs / Infra**: currently empty placeholders (`docs/`, `infra/`)
 
-## Prerequisites
+## 🧩 Tech stack
 
-Backend development requires:
+- Frontend: React, Vite, TypeScript, TailwindCSS
+- Backend: Drogon, Conan, CMake, AWS SDK (S3)
+- Services: PostgreSQL (DB), MinIO (S3-compatible storage)
 
-- C++ toolchain
-- CMake (>= 3.15)
-- Conan 2.x
-- Docker (recommended, for running PostgreSQL locally)
+## 🚀 Quick start (local dev)
 
-## Quickstart (Backend)
-
-### 1) Start PostgreSQL (Docker)
-
-From the backend folder, start the DB container:
+### 1) Start backend dependencies (Postgres + MinIO)
 
 ```bash
 cd backend
 docker compose up -d
 ```
 
-This uses the default credentials in `backend/docker-compose.yml`:
+This brings up:
 
-- DB: `ieee_conference_db`
-- User: `postgres`
-- Password: `postgres`
-- Host port: `5432`
+- 🗄️ PostgreSQL: `localhost:5432` (db `ieee_conference_db`, user `postgres`, pass `postgres`)
+- 🪣 MinIO (S3 API): `http://localhost:9000`
+- 🧭 MinIO Console: `http://localhost:9001`
 
-### 2) Build the backend
+MinIO defaults (from `backend/docker-compose.yml`):
+
+- Access key: `suryansh`
+- Secret key: `suryansh`
+
+### 2) Configure backend env
+
+The backend loads environment variables from a local `.env` file (read from the current working directory).
+
+```bash
+cd backend
+cp .env.example .env
+```
+
+Typical variables:
+
+- `PORT` (default `3000`)
+- `JWT_SECRET` (required for auth tokens)
+- `S3_ENDPOINT`, `S3_REGION`, `S3_ACCESS_KEY`, `S3_SECRET_KEY`, `S3_BUCKET`, `S3_USE_SSL`
+
+### 3) Build + run the backend
+
+Prereqs:
+
+- C++ toolchain
+- CMake (>= 3.15)
+- Conan 2.x
+
+Build:
 
 ```bash
 cd backend
@@ -44,63 +67,63 @@ cmake --preset conan-release
 cmake --build --preset conan-release
 ```
 
-### 3) Configure environment
-
-The backend loads environment variables from `.env` at startup.
-
-- Copy and edit as needed:
-
-```bash
-cd backend
-cp .env.example .env
-```
-
-Currently supported:
-
-- `PORT` (defaults to `3000`)
-
-### 4) Run the backend
-
-Important: the server loads `./config/config.json` as a **relative** path, so run it from inside the `backend/` directory.
+Run (important: run from inside `backend/` because config is loaded via a relative path `./config/config.json`):
 
 ```bash
 cd backend
 ./build/build/Release/IEEE_Conference_Backend
 ```
 
-You should see a log like:
+### 4) Run the frontend
 
+Prereqs:
+
+- Node.js (LTS recommended)
+- npm
+
+```bash
+cd frontend
+npm install
+npm run dev
 ```
-server is listening on port:3000
-```
 
-## Configuration
+Vite will print the local dev URL (typically `http://localhost:5173`).
 
-- Server port: `backend/.env` (`PORT`)
-- Database connection: `backend/config/config.json`
+## 🔌 API (backend)
 
-By default, the database configuration points to:
+Base URL (default): `http://localhost:3000`
 
-- host: `127.0.0.1`
-- port: `5432`
+- ✅ Health check: `GET /health`
+- 🔐 Users (base: `/api/v1/users`)
+	- `POST /api/v1/users/login`
+	- `POST /api/v1/users/signup`
+	- `GET /api/v1/users?page=1&limit=10`
+	- `GET /api/v1/users/profile?id=123`
+	- `PUT /api/v1/users?id=123` (requires `Authorization: Bearer <token>`)
+	- `DELETE /api/v1/users/{id}` (requires `Authorization: Bearer <token>`)
 
-If you run PostgreSQL differently (e.g., remote DB), update `backend/config/config.json`.
-
-## Repository Structure
+## 🗂️ Repository structure
 
 ```text
 .
-├── backend/                 # Drogon C++ server (active)
-│   ├── src/                 # main.cc + app folders (currently mostly empty)
-│   ├── config/config.json   # Drogon + DB config
-│   ├── .env.example         # Example env
-│   └── docker-compose.yml   # Local Postgres
-├── frontend/                # (empty placeholder)
-├── infra/                   # (empty placeholder)
-└── docs/                    # (empty placeholder)
+├── backend/                  # Drogon C++ API + docker services
+│   ├── docker-compose.yml     # Postgres + MinIO for local dev
+│   ├── docker-compose.prod.yml# Backend container (app-only)
+│   ├── config/config.json     # DB client config (defaults to 127.0.0.1:5432)
+│   ├── sql/                   # DB init scripts (e.g., users table)
+│   └── src/                   # controllers/filters/services + main
+├── frontend/                 # React + Vite + Tailwind site
+├── docs/                     # placeholder
+├── infra/                    # placeholder
+└── docker-compose.yml        # currently empty placeholder
 ```
 
-## Notes
+## 🧰 Notes & troubleshooting
 
-- The root-level `docker-compose.yml` and `app.env` are currently empty placeholders.
-- `backend/Dockerfile` is currently empty; containerizing the backend is not wired up yet.
+- If the backend can’t find its config, make sure you started it from `backend/`.
+- If DB connection fails, check `backend/config/config.json` and that Postgres is running on `localhost:5432`.
+- MinIO is started by `backend/docker-compose.yml`; update `backend/.env` if you change MinIO credentials/ports.
+
+## 📄 License
+
+See [LICENSE](LICENSE).
