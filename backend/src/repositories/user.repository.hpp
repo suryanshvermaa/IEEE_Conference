@@ -7,6 +7,7 @@ struct user
     std::string email;
     std::string passwordHash;
     std::string role;
+    std::string profilePictureUrl;
 };
 
 namespace UserRepository{

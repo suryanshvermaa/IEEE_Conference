@@ -1,6 +1,7 @@
 #include"./user.repository.hpp"
 #include"../models/Users.h"
 #include"../config/database.h"
+#include"../services/S3Service.h"
 
 using namespace drogon_model::ieee_conference_db;
 using namespace drogon::orm;
@@ -37,6 +38,7 @@ std::vector<user> UserRepository::getUsers(int page,int limit){
             u.email=dbUser.getValueOfEmail();
             u.passwordHash=dbUser.getValueOfPasswordHash();
             u.role=dbUser.getValueOfRole();
+            if(dbUser.getValueOfProfilePictureObjectKey() != "") u.profilePictureUrl=getSignedUrl(dbUser.getValueOfProfilePictureObjectKey());
             users.push_back(u);
         }
         return users;
@@ -59,6 +61,7 @@ user UserRepository::getUser(int id){
         u.email=dbUser.getValueOfEmail();
         u.passwordHash=dbUser.getValueOfPasswordHash();
         u.role=dbUser.getValueOfRole();
+        if(dbUser.getValueOfProfilePictureObjectKey() != "") u.profilePictureUrl=getSignedUrl(dbUser.getValueOfProfilePictureObjectKey());
         return u;
     }
     catch(const std::exception& e)
@@ -79,6 +82,7 @@ user UserRepository::getUserByEmail(const std::string& email){
         u.email=dbUser.getValueOfEmail();
         u.passwordHash=dbUser.getValueOfPasswordHash();
         u.role=dbUser.getValueOfRole();
+        if(dbUser.getValueOfProfilePictureObjectKey() != "") u.profilePictureUrl=getSignedUrl(dbUser.getValueOfProfilePictureObjectKey());
         return u;
     }
     catch(const std::exception& e)
@@ -86,6 +90,19 @@ user UserRepository::getUserByEmail(const std::string& email){
         std::cerr << e.what() << '\n';
         return {};
     }
+}
+
+std::string getS3KeyFromUrl(const std::string &url){
+    size_t pos = url.find("?");
+    std::string key;
+    if (pos != std::string::npos) {
+        key = url.substr(0, pos);
+    }
+    size_t lastSlash = key.find_last_of("/");
+    if (lastSlash != std::string::npos) {
+        return key.substr(lastSlash + 1);
+    }
+    return key;
 }
 
 bool UserRepository::updateUser(int id,const user& u){
@@ -97,6 +114,7 @@ bool UserRepository::updateUser(int id,const user& u){
         dbUser.setEmail(u.email);
         dbUser.setPasswordHash(u.passwordHash);
         dbUser.setRole(u.role);
+        if(u.profilePictureUrl != "") dbUser.setProfilePictureObjectKey(getS3KeyFromUrl(u.profilePictureUrl));
         mapper.update(dbUser);
         return true;
     }

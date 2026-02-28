@@ -4,6 +4,7 @@
 #include "../utils/response.hpp"
 #include "../utils/AppError.hpp"
 #include "../repositories/user.repository.hpp"
+#include "../services/S3Service.h"
 
 using namespace api::v1;
 
@@ -151,7 +152,7 @@ void users::getUser(const HttpRequestPtr& req, std::function<void (const HttpRes
 void users::updateUser(const HttpRequestPtr& req, std::function<void (const HttpResponsePtr &)> &&callback){
     try
     {
-        auto id=req->getParameter("id");
+        auto id=req->getParameter("userId");
         if(id.empty())
             throw AppError("User ID is required", k400BadRequest);
         int userId=std::stoi(id);
@@ -169,6 +170,8 @@ void users::updateUser(const HttpRequestPtr& req, std::function<void (const Http
             u.passwordHash=Auth::getHashPassword((*reqBody)["password"].asString());
         if(reqBody->isMember("role"))
             u.role=(*reqBody)["role"].asString();
+        if(reqBody->isMember("profilePicture"))
+            u.profilePictureUrl=(*reqBody)["profilePicture"].asString();
         
         if(!UserRepository::updateUser(userId,u))
             throw AppError("Failed to update user", k500InternalServerError);
@@ -206,4 +209,29 @@ void users::deleteUserByAdmin(const HttpRequestPtr& req, std::function<void (con
         LOG_ERROR << e.what();
         callback(Response::error(k400BadRequest, "Invalid request"));
     }    
+}
+
+void users::uploadProfilePicture(const HttpRequestPtr& req, std::function<void (const HttpResponsePtr &)> &&callback){
+    try
+    {
+        auto id=req->getParameter("userId");
+        auto body=req->getJsonObject();
+        if(id.empty())
+            throw AppError("User ID is required", k400BadRequest);
+        Json::Value resBody;
+        const std::string extOfFile=(*body)["file_extension"].asString();
+        const std::string key="profile_pictures/user_"+id+"."+extOfFile;
+        resBody["upload_url"] = putObjectSignedUrl(key);
+        callback(Response::success(k200OK,"Profile picture upload URL generated successfully",resBody));
+    }
+    catch(const AppError& e)
+    {
+        LOG_ERROR << e.what();
+        callback(Response::error(e.statusCode, e.what()));
+    }
+    catch(const std::exception& e)
+    {
+        LOG_ERROR << e.what();
+        callback(Response::error(k400BadRequest, "Invalid request"));
+    }
 }

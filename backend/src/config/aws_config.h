@@ -64,7 +64,16 @@ inline Aws::Client::ClientConfiguration clientConfig()
     config.region = getEnv("S3_REGION", "us-east-1");
     auto endpoint = getEnv("S3_ENDPOINT");
     if (!endpoint.empty())
+    {
+        const std::string httpPrefix = "http://";
+        const std::string httpsPrefix = "https://";
+        if (endpoint.rfind(httpPrefix, 0) == 0)
+            endpoint = endpoint.substr(httpPrefix.size());
+        else if (endpoint.rfind(httpsPrefix, 0) == 0)
+            endpoint = endpoint.substr(httpsPrefix.size());
+
         config.endpointOverride = endpoint;
+    }
 
     config.scheme = getEnvBool("S3_USE_SSL", true)
         ? Aws::Http::Scheme::HTTPS

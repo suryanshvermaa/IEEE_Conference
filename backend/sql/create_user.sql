@@ -4,6 +4,7 @@ CREATE TABLE users(
     password_hash VARCHAR(255) NOT NULL,
     username VARCHAR(255) NOT NULL,
     role VARCHAR(50) NOT NULL,
+    profile_picture_object_key VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
