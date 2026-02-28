@@ -47,6 +47,7 @@ class Users
         static const std::string _email;
         static const std::string _password_hash;
         static const std::string _username;
+        static const std::string _role;
         static const std::string _created_at;
         static const std::string _updated_at;
     };
@@ -135,6 +136,15 @@ class Users
     void setUsername(const std::string &pUsername) noexcept;
     void setUsername(std::string &&pUsername) noexcept;
 
+    /**  For column role  */
+    ///Get the value of the column role, returns the default value if the column is null
+    const std::string &getValueOfRole() const noexcept;
+    ///Return a shared_ptr object pointing to the column const value, or an empty shared_ptr object if the column is null
+    const std::shared_ptr<std::string> &getRole() const noexcept;
+    ///Set the value of the column role
+    void setRole(const std::string &pRole) noexcept;
+    void setRole(std::string &&pRole) noexcept;
+
     /**  For column created_at  */
     ///Get the value of the column created_at, returns the default value if the column is null
     const ::trantor::Date &getValueOfCreatedAt() const noexcept;
@@ -154,7 +164,7 @@ class Users
     void setUpdatedAtToNull() noexcept;
 
 
-    static size_t getColumnNumber() noexcept {  return 6;  }
+    static size_t getColumnNumber() noexcept {  return 7;  }
     static const std::string &getColumnName(size_t index) noexcept(false);
 
     Json::Value toJson() const;
@@ -179,6 +189,7 @@ class Users
     std::shared_ptr<std::string> email_;
     std::shared_ptr<std::string> passwordHash_;
     std::shared_ptr<std::string> username_;
+    std::shared_ptr<std::string> role_;
     std::shared_ptr<::trantor::Date> createdAt_;
     std::shared_ptr<::trantor::Date> updatedAt_;
     struct MetaData
@@ -192,7 +203,7 @@ class Users
         const bool notNull_;
     };
     static const std::vector<MetaData> metaData_;
-    bool dirtyFlag_[6]={ false };
+    bool dirtyFlag_[7]={ false };
   public:
     static const std::string &sqlForFindingByPrimaryKey()
     {
@@ -227,15 +238,20 @@ class Users
             sql += "username,";
             ++parametersCount;
         }
+        if(dirtyFlag_[4])
+        {
+            sql += "role,";
+            ++parametersCount;
+        }
         sql += "created_at,";
         ++parametersCount;
-        if(!dirtyFlag_[4])
+        if(!dirtyFlag_[5])
         {
             needSelection=true;
         }
         sql += "updated_at,";
         ++parametersCount;
-        if(!dirtyFlag_[5])
+        if(!dirtyFlag_[6])
         {
             needSelection=true;
         }
@@ -272,11 +288,16 @@ class Users
             n = sprintf(placeholderStr,"$%d,",placeholder++);
             sql.append(placeholderStr, n);
         }
+        if(dirtyFlag_[5])
+        {
+            n = sprintf(placeholderStr,"$%d,",placeholder++);
+            sql.append(placeholderStr, n);
+        }
         else
         {
             sql +="default,";
         }
-        if(dirtyFlag_[5])
+        if(dirtyFlag_[6])
         {
             n = sprintf(placeholderStr,"$%d,",placeholder++);
             sql.append(placeholderStr, n);

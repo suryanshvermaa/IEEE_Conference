@@ -6,10 +6,7 @@
 void health::healthController(const HttpRequestPtr& req, std::function<void (const HttpResponsePtr &)> &&callback){
     try
     {
-        Json::Value res;
-        const std::string key="Resume.pdf";
-        res["url"]=getSignedUrl(key);
-        callback(Response::success(k200OK,"heathy",res));
+        callback(Response::success(k200OK,"heathy"));
     }
     catch(const std::exception& e)
     {

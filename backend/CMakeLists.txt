@@ -4,6 +4,7 @@ project(IEEE_Conference_Backend VERSION 1.0.0)
 find_package(Drogon REQUIRED)
 find_package(AWSSDK CONFIG REQUIRED)
 find_package(jwt-cpp REQUIRED)
+find_package(libxcrypt REQUIRED)
 
 add_executable(IEEE_Conference_Backend
     # config
@@ -11,6 +12,7 @@ add_executable(IEEE_Conference_Backend
 
     # controllers
     ./src/controllers/health.cc
+    ./src/controllers/api_v1_users.cc
 
     # # models
     ./src/models/Users.cc
@@ -25,6 +27,9 @@ add_executable(IEEE_Conference_Backend
     # utils
     ./src/utils/token.cc
 
+    # repositories
+    ./src/repositories/user.repository.cc
+
     # main
     ./src/main.cc)
 
@@ -33,4 +38,5 @@ target_link_libraries(IEEE_Conference_Backend PRIVATE
     AWS::aws-sdk-cpp-s3
     AWS::aws-sdk-cpp-core
     jwt-cpp::jwt-cpp
+    libxcrypt::libxcrypt
 )
