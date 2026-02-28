@@ -1,6 +1,7 @@
 [requires]
 drogon/1.9.12
 aws-sdk-cpp/1.11.692
+jwt-cpp/0.7.1
 
 [generators]
 CMakeDeps

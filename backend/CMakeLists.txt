@@ -3,6 +3,7 @@ project(IEEE_Conference_Backend VERSION 1.0.0)
 
 find_package(Drogon REQUIRED)
 find_package(AWSSDK CONFIG REQUIRED)
+find_package(jwt-cpp REQUIRED)
 
 add_executable(IEEE_Conference_Backend
     # config
@@ -21,6 +22,9 @@ add_executable(IEEE_Conference_Backend
     # services
     ./src/services/S3Service.cc
 
+    # utils
+    ./src/utils/token.cc
+
     # main
     ./src/main.cc)
 
@@ -28,4 +32,5 @@ target_link_libraries(IEEE_Conference_Backend PRIVATE
     Drogon::Drogon
     AWS::aws-sdk-cpp-s3
     AWS::aws-sdk-cpp-core
+    jwt-cpp::jwt-cpp
 )
