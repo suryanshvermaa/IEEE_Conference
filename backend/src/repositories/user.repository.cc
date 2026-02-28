@@ -20,7 +20,7 @@ int UserRepository::createUser(const user& u){
     catch(const std::exception& e)
     {
         std::cerr << e.what() << '\n';
-        return -1;
+        return 0;
     }
 }
 
@@ -68,6 +68,26 @@ user UserRepository::getUser(int id){
     }
 }
 
+user UserRepository::getUserByEmail(const std::string& email){
+    try
+    {
+        Mapper<Users> mapper(Database::getClient());
+        auto dbUser=mapper.findOne(Criteria(Users::Cols::_email, email));
+        user u;
+        u.id=dbUser.getValueOfId();
+        u.name=dbUser.getValueOfUsername();
+        u.email=dbUser.getValueOfEmail();
+        u.passwordHash=dbUser.getValueOfPasswordHash();
+        u.role=dbUser.getValueOfRole();
+        return u;
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+        return {};
+    }
+}
+
 bool UserRepository::updateUser(int id,const user& u){
     try
     {
@@ -91,6 +111,10 @@ bool UserRepository::deleteUser(int id){
     try
     {
         Mapper<Users> mapper(Database::getClient());
+        auto dbUser=mapper.findByPrimaryKey(id); // Check if the user exists
+        if(!dbUser.getId()){
+            return false; // User does not exist
+        }
         mapper.deleteByPrimaryKey(id);
         return true;
     }

@@ -10,7 +10,7 @@ void health::healthController(const HttpRequestPtr& req, std::function<void (con
     }
     catch(const std::exception& e)
     {
-        std::cerr << e.what() << '\n';
+        LOG_ERROR << e.what();
         callback(Response::error(k400BadRequest,e.what()));
     }
     
