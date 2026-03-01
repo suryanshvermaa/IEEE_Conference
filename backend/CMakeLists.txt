@@ -33,6 +33,16 @@ add_executable(IEEE_Conference_Backend
     # main
     ./src/main.cc)
 
+add_executable(createAdmin
+./src/utils/token.cc
+./scripts/createAdmin.cc)
+
+target_link_libraries(createAdmin PRIVATE
+    jwt-cpp::jwt-cpp
+    Drogon::Drogon
+    libxcrypt::libxcrypt
+)
+
 target_link_libraries(IEEE_Conference_Backend PRIVATE
     Drogon::Drogon
     AWS::aws-sdk-cpp-s3
