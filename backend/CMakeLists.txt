@@ -29,6 +29,7 @@ add_executable(IEEE_Conference_Backend
 
     # repositories
     ./src/repositories/user.repository.cc
+    ./src/repositories/notification.repository.cc
 
     # main
     ./src/main.cc)
