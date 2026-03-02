@@ -13,9 +13,11 @@ add_executable(IEEE_Conference_Backend
     # controllers
     ./src/controllers/health.cc
     ./src/controllers/api_v1_users.cc
+    ./src/controllers/api_v1_notifications.cc
 
     # # models
     ./src/models/Users.cc
+    ./src/models/Notifications.cc
 
     # filters
     ./src/filters/CorsFilter.cc

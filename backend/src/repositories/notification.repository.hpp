@@ -5,16 +5,10 @@ using std::string;
 using std::vector;
 using std::unordered_map;
 
-enum class NotificationType {
-    HIGHLIGHTS,
-    RECENT_UPDATES,
-};
 
 
-static const unordered_map<NotificationType, std::string> notificationMap = {
-    {NotificationType::HIGHLIGHTS, "HIGHLIGHTS"},
-    {NotificationType::RECENT_UPDATES, "RECENT_UPDATES"},
-};
+
+static string validTypes[]={"HIGHLIGHTS","RECENT_UPDATES"};
 
 struct notification
 {
