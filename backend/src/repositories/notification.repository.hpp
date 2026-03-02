@@ -1,12 +1,7 @@
 #include <iostream>
 #include <vector>
-#include<unordered_map>
 using std::string;
 using std::vector;
-using std::unordered_map;
-
-
-
 
 static string validTypes[]={"HIGHLIGHTS","RECENT_UPDATES"};
 

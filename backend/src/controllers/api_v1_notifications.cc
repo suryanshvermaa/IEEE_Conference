@@ -59,7 +59,7 @@ void notifications::getNotifications(const HttpRequestPtr& req, std::function<vo
     }
 }
 
-void getNotification(const HttpRequestPtr& req, std::function<void (const HttpResponsePtr &)> &&callback,int id)
+void notifications::getNotification(const HttpRequestPtr& req, std::function<void (const HttpResponsePtr &)> &&callback,int id)
 {
     try
     {
@@ -156,3 +156,9 @@ void notifications::deleteNotification(const HttpRequestPtr& req, std::function<
         LOG_ERROR<<e.what();
         callback(Response::error(e.statusCode,e.what()));
     }
+    catch(const std::exception& e)
+    {
+        LOG_ERROR<<e.what();
+        callback(Response::error(k400BadRequest,e.what()));
+    }
+}

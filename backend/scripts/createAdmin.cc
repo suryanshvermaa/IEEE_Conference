@@ -1,8 +1,3 @@
--- Active: 1772287724492@@127.0.0.1@5432@ieee_conference_db
-// Standalone CLI tool to create an admin user.
-// Uses JsonCpp to read DB connection info from ./config/config.json.
-// Does NOT require running the Drogon server.
-
 #include <drogon/orm/DbClient.h>
 #include <drogon/orm/Exception.h>
 
