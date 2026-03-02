@@ -20,7 +20,6 @@ add_executable(IEEE_Conference_Backend
     ./src/models/Notifications.cc
 
     # filters
-    ./src/filters/CorsFilter.cc
     ./src/filters/AuthFilter.cc
 
     # services

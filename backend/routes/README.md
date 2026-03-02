@@ -1,10 +1,12 @@
-# Backend API Routes (Frontend Reference)
+# Backend Routes (Frontend Reference)
 
-This folder is the single source of truth for **all HTTP routes** exposed by the backend.
+This folder documents the **HTTP routes** exposed by the Drogon backend.
 
-- API base: `http://localhost:3000`
-- API prefix: `/api/v1`
-- Auth: `Authorization: Bearer <jwt>`
+- Base URL (local): `http://localhost:3000` (or `PORT` from `.env`)
+- Versioned API prefix: `/api/v1`
+- Health route has no `/api/v1` prefix: `GET /health`
+
+The canonical contract is `openapi.yaml` (in this same folder). This README is a quick summary for frontend usage.
 
 ## Response envelope
 
@@ -16,9 +18,11 @@ All endpoints return a JSON envelope:
 {
   "success": true,
   "message": "...",
-  "data": "(optional, present only when endpoint returns data)"
+  "data": {}
 }
 ```
+
+`data` is omitted when an endpoint does not return anything.
 
 ### Error
 
@@ -31,14 +35,17 @@ All endpoints return a JSON envelope:
 
 ## Authentication (JWT)
 
-Some routes are protected by the `AuthFilter`.
+Protected routes use Drogon's `AuthFilter`.
 
-- Send header: `Authorization: Bearer <token>`
-- If missing/invalid: `401` with `{ success: false, message: "Unauthorized: ..." }`
+- Header: `Authorization: Bearer <jwt>`
+- Missing/invalid token: `401` with `{"success":false,"message":"Unauthorized: ..."}`
 
-The backend embeds these JWT claims:
-- `userId` (string)
+JWT contents (as used by the backend):
+
+- `userId` (integer)
 - `role` (string)
+
+Implementation detail: `AuthFilter` injects `userId` and `role` into request parameters for downstream handlers.
 
 ## Pagination
 
