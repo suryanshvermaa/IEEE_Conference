@@ -67,7 +67,9 @@ Firebase::decodeAndVerifyFirebaseToken(const std::string& token)
         const std::string projectId = std::getenv("FIREBASE_PROJECT_ID");
 
         auto decodedToken = jwt::decode(token);
-
+        for(auto &el:decodedToken.get_payload()){
+            std::cout<<el;
+        }
         const std::string kid =
             decodedToken.get_header_claim("kid").as_string();
 
@@ -92,6 +94,11 @@ Firebase::decodeAndVerifyFirebaseToken(const std::string& token)
 
         data.email =
             decodedToken.get_payload_claim("email").as_string();
+
+        data.picture=
+            decodedToken.get_payload_claim("picture").as_string();
+        data.name=
+            decodedToken.get_payload_claim("name").as_string();
 
         auto firebaseClaim =
             decodedToken.get_payload_claim("firebase").to_json();

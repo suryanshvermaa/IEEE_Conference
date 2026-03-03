@@ -15,6 +15,7 @@ int UserRepository::createUser(const user& u){
         user.setPasswordHash(u.passwordHash);
         user.setRole(u.role);
         if(u.provider != "") user.setProvider(u.provider);
+        if(u.profilePictureUrl != "") user.setProfilePictureObjectKey(u.profilePictureUrl);
         Mapper<Users> mapper(Database::getClient());
         mapper.insert(user);
         return user.getValueOfId();
@@ -40,7 +41,7 @@ std::vector<user> UserRepository::getUsers(int page,int limit){
             u.passwordHash=dbUser.getValueOfPasswordHash();
             u.role=dbUser.getValueOfRole();
             u.provider=dbUser.getValueOfProvider();
-            if(dbUser.getValueOfProfilePictureObjectKey() != "") u.profilePictureUrl=getSignedUrl(dbUser.getValueOfProfilePictureObjectKey());
+            if(dbUser.getValueOfProfilePictureObjectKey() != ""&&u.profilePictureUrl.find("https://") == std::string::npos) u.profilePictureUrl=getSignedUrl(dbUser.getValueOfProfilePictureObjectKey());
             users.push_back(u);
         }
         return users;
@@ -64,7 +65,7 @@ user UserRepository::getUser(int id){
         u.passwordHash=dbUser.getValueOfPasswordHash();
         u.role=dbUser.getValueOfRole();
         u.provider=dbUser.getValueOfProvider();
-        if(dbUser.getValueOfProfilePictureObjectKey() != "") u.profilePictureUrl=getSignedUrl(dbUser.getValueOfProfilePictureObjectKey());
+        if(dbUser.getValueOfProfilePictureObjectKey() != ""&&u.profilePictureUrl.find("https://") == std::string::npos) u.profilePictureUrl=getSignedUrl(dbUser.getValueOfProfilePictureObjectKey());
         return u;
     }
     catch(const std::exception& e)
@@ -86,7 +87,7 @@ user UserRepository::getUserByEmail(const std::string& email){
         u.passwordHash=dbUser.getValueOfPasswordHash();
         u.role=dbUser.getValueOfRole();
         u.provider=dbUser.getValueOfProvider();
-        if(dbUser.getValueOfProfilePictureObjectKey() != "") u.profilePictureUrl=getSignedUrl(dbUser.getValueOfProfilePictureObjectKey());
+        if(dbUser.getValueOfProfilePictureObjectKey() != ""&&u.profilePictureUrl.find("https://") == std::string::npos) u.profilePictureUrl=getSignedUrl(dbUser.getValueOfProfilePictureObjectKey());
         return u;
     }
     catch(const std::exception& e)

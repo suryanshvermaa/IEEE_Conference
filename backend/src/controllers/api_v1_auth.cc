@@ -134,6 +134,8 @@ void auth::firebaseSignup(const HttpRequestPtr& req, std::function<void (const H
         newUser.provider=provider;
         newUser.passwordHash=Auth::getHashPassword(firebaseUid);
         newUser.role="user";
+        newUser.profilePictureUrl=firebaseUser->picture;
+        newUser.name=firebaseUser->name;
         int userId=UserRepository::createUser(newUser);
         if(userId==0) throw AppError("Failed to create user", k500InternalServerError);
         Json::Value response;

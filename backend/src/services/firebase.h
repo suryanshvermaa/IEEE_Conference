@@ -10,6 +10,8 @@ struct FirebaseData {
     std::string uid;
     std::string email;
     std::string provider;
+    std::string name;
+    std::string picture;
 };
 
 class Firebase {
