@@ -47,6 +47,19 @@ JWT contents (as used by the backend):
 
 Implementation detail: `AuthFilter` injects `userId` and `role` into request parameters for downstream handlers.
 
+## Auth endpoints
+
+Base: `/api/v1/auth`
+
+- `POST /api/v1/auth/login` (local)
+  - Body: `{ "email": string, "password": string }`
+- `POST /api/v1/auth/signup` (local)
+  - Body: `{ "name": string, "email": string, "password": string }`
+- `POST /api/v1/auth/firebase/login`
+  - Body: `{ "token": "<firebase_id_token>" }`
+- `POST /api/v1/auth/firebase/signup`
+  - Body: `{ "token": "<firebase_id_token>" }`
+
 ## Pagination
 
 ### Users
