@@ -17,6 +17,7 @@ class users : public drogon::HttpController<users>
     METHOD_ADD(users::updateUser, "", Put,"AuthFilter"); // path -> /api/v1/users/{id}
     METHOD_ADD(users::deleteUserByAdmin, "/{id}", Delete,"AuthFilter","AdminFilter"); // path -> /api/v1/users/{id} -> for admin use only
     METHOD_ADD(users::uploadProfilePicture, "/uploadProfilePicture", Post,"AuthFilter"); // path -> /api/v1/users/uploadProfilePicture
+    METHOD_ADD(users::makeAdmin, "/makeAdmin", Post,"AuthFilter","AdminFilter"); // path -> /api/v1/users/makeAdmin
 
     METHOD_LIST_END
     void getUsers(const HttpRequestPtr& req, std::function<void (const HttpResponsePtr &)> &&callback);
@@ -24,6 +25,7 @@ class users : public drogon::HttpController<users>
     void updateUser(const HttpRequestPtr& req, std::function<void (const HttpResponsePtr &)> &&callback);
     void deleteUserByAdmin(const HttpRequestPtr& req, std::function<void (const HttpResponsePtr &)> &&callback, int id);
     void uploadProfilePicture(const HttpRequestPtr& req, std::function<void (const HttpResponsePtr &)> &&callback);
+    void makeAdmin(const HttpRequestPtr& req, std::function<void (const HttpResponsePtr &)> &&callback);
 };
 }
 }

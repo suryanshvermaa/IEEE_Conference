@@ -15,7 +15,7 @@ void AdminFilter::doFilter(const HttpRequestPtr &req,
                          FilterChainCallback &&fccb)
 {
     auto role=req->getParameter("role");
-    if(role=="ADMIN"){
+    if(role=="admin"){
         fccb();
         return;
     }

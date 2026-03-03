@@ -161,3 +161,30 @@ void users::uploadProfilePicture(const HttpRequestPtr& req, std::function<void (
         callback(Response::error(k400BadRequest, "Invalid request"));
     }
 }
+
+void users::makeAdmin(const HttpRequestPtr& req, std::function<void (const HttpResponsePtr &)> &&callback){
+    try
+    {
+        auto id=req->getParameter("userId");
+        if(id.empty())
+            throw AppError("User ID is required", k400BadRequest);
+        int userId=std::stoi(id);
+        user u;
+        u.id=userId;
+        u.role="admin";
+        if(!UserRepository::updateUser(userId,u))
+            throw AppError("User not found or failed to update role", k404NotFound);
+        
+        callback(Response::success(k200OK,"User role updated to admin successfully"));
+    }
+    catch(const AppError& e)
+    {
+        LOG_ERROR << e.what();
+        callback(Response::error(e.statusCode, e.what()));
+    }
+    catch(const std::exception& e)
+    {
+        LOG_ERROR << e.what();
+        callback(Response::error(k400BadRequest, "Invalid request"));
+    }    
+}
