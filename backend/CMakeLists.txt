@@ -13,6 +13,7 @@ add_executable(IEEE_Conference_Backend
     # controllers
     ./src/controllers/health.cc
     ./src/controllers/api_v1_users.cc
+    ./src/controllers/api_v1_auth.cc
     ./src/controllers/api_v1_notifications.cc
 
     # # models
@@ -24,6 +25,7 @@ add_executable(IEEE_Conference_Backend
 
     # services
     ./src/services/S3Service.cc
+    ./src/services/firebase.cc
 
     # utils
     ./src/utils/token.cc

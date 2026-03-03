@@ -8,6 +8,7 @@ struct user
     std::string passwordHash;
     std::string role;
     std::string profilePictureUrl;
+    std::string provider;
 };
 
 namespace UserRepository{

@@ -14,6 +14,7 @@ int UserRepository::createUser(const user& u){
         user.setEmail(u.email);
         user.setPasswordHash(u.passwordHash);
         user.setRole(u.role);
+        if(u.provider != "") user.setProvider(u.provider);
         Mapper<Users> mapper(Database::getClient());
         mapper.insert(user);
         return user.getValueOfId();
@@ -38,6 +39,7 @@ std::vector<user> UserRepository::getUsers(int page,int limit){
             u.email=dbUser.getValueOfEmail();
             u.passwordHash=dbUser.getValueOfPasswordHash();
             u.role=dbUser.getValueOfRole();
+            u.provider=dbUser.getValueOfProvider();
             if(dbUser.getValueOfProfilePictureObjectKey() != "") u.profilePictureUrl=getSignedUrl(dbUser.getValueOfProfilePictureObjectKey());
             users.push_back(u);
         }
@@ -61,6 +63,7 @@ user UserRepository::getUser(int id){
         u.email=dbUser.getValueOfEmail();
         u.passwordHash=dbUser.getValueOfPasswordHash();
         u.role=dbUser.getValueOfRole();
+        u.provider=dbUser.getValueOfProvider();
         if(dbUser.getValueOfProfilePictureObjectKey() != "") u.profilePictureUrl=getSignedUrl(dbUser.getValueOfProfilePictureObjectKey());
         return u;
     }
@@ -82,6 +85,7 @@ user UserRepository::getUserByEmail(const std::string& email){
         u.email=dbUser.getValueOfEmail();
         u.passwordHash=dbUser.getValueOfPasswordHash();
         u.role=dbUser.getValueOfRole();
+        u.provider=dbUser.getValueOfProvider();
         if(dbUser.getValueOfProfilePictureObjectKey() != "") u.profilePictureUrl=getSignedUrl(dbUser.getValueOfProfilePictureObjectKey());
         return u;
     }

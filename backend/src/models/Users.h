@@ -46,6 +46,7 @@ class Users
         static const std::string _id;
         static const std::string _email;
         static const std::string _password_hash;
+        static const std::string _provider;
         static const std::string _username;
         static const std::string _role;
         static const std::string _profile_picture_object_key;
@@ -127,6 +128,16 @@ class Users
     ///Set the value of the column password_hash
     void setPasswordHash(const std::string &pPasswordHash) noexcept;
     void setPasswordHash(std::string &&pPasswordHash) noexcept;
+    void setPasswordHashToNull() noexcept;
+
+    /**  For column provider  */
+    ///Get the value of the column provider, returns the default value if the column is null
+    const std::string &getValueOfProvider() const noexcept;
+    ///Return a shared_ptr object pointing to the column const value, or an empty shared_ptr object if the column is null
+    const std::shared_ptr<std::string> &getProvider() const noexcept;
+    ///Set the value of the column provider
+    void setProvider(const std::string &pProvider) noexcept;
+    void setProvider(std::string &&pProvider) noexcept;
 
     /**  For column username  */
     ///Get the value of the column username, returns the default value if the column is null
@@ -175,7 +186,7 @@ class Users
     void setUpdatedAtToNull() noexcept;
 
 
-    static size_t getColumnNumber() noexcept {  return 8;  }
+    static size_t getColumnNumber() noexcept {  return 9;  }
     static const std::string &getColumnName(size_t index) noexcept(false);
 
     Json::Value toJson() const;
@@ -199,6 +210,7 @@ class Users
     std::shared_ptr<int32_t> id_;
     std::shared_ptr<std::string> email_;
     std::shared_ptr<std::string> passwordHash_;
+    std::shared_ptr<std::string> provider_;
     std::shared_ptr<std::string> username_;
     std::shared_ptr<std::string> role_;
     std::shared_ptr<std::string> profilePictureObjectKey_;
@@ -215,7 +227,7 @@ class Users
         const bool notNull_;
     };
     static const std::vector<MetaData> metaData_;
-    bool dirtyFlag_[8]={ false };
+    bool dirtyFlag_[9]={ false };
   public:
     static const std::string &sqlForFindingByPrimaryKey()
     {
@@ -245,30 +257,36 @@ class Users
             sql += "password_hash,";
             ++parametersCount;
         }
-        if(dirtyFlag_[3])
+        sql += "provider,";
+        ++parametersCount;
+        if(!dirtyFlag_[3])
+        {
+            needSelection=true;
+        }
+        if(dirtyFlag_[4])
         {
             sql += "username,";
             ++parametersCount;
         }
-        if(dirtyFlag_[4])
+        if(dirtyFlag_[5])
         {
             sql += "role,";
             ++parametersCount;
         }
-        if(dirtyFlag_[5])
+        if(dirtyFlag_[6])
         {
             sql += "profile_picture_object_key,";
             ++parametersCount;
         }
         sql += "created_at,";
         ++parametersCount;
-        if(!dirtyFlag_[6])
+        if(!dirtyFlag_[7])
         {
             needSelection=true;
         }
         sql += "updated_at,";
         ++parametersCount;
-        if(!dirtyFlag_[7])
+        if(!dirtyFlag_[8])
         {
             needSelection=true;
         }
@@ -300,6 +318,10 @@ class Users
             n = sprintf(placeholderStr,"$%d,",placeholder++);
             sql.append(placeholderStr, n);
         }
+        else
+        {
+            sql +="default,";
+        }
         if(dirtyFlag_[4])
         {
             n = sprintf(placeholderStr,"$%d,",placeholder++);
@@ -315,11 +337,16 @@ class Users
             n = sprintf(placeholderStr,"$%d,",placeholder++);
             sql.append(placeholderStr, n);
         }
+        if(dirtyFlag_[7])
+        {
+            n = sprintf(placeholderStr,"$%d,",placeholder++);
+            sql.append(placeholderStr, n);
+        }
         else
         {
             sql +="default,";
         }
-        if(dirtyFlag_[7])
+        if(dirtyFlag_[8])
         {
             n = sprintf(placeholderStr,"$%d,",placeholder++);
             sql.append(placeholderStr, n);
