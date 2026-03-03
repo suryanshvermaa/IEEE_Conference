@@ -22,6 +22,7 @@ add_executable(IEEE_Conference_Backend
 
     # filters
     ./src/filters/AuthFilter.cc
+    ./src/filters/AdminFilter.cc
 
     # services
     ./src/services/S3Service.cc

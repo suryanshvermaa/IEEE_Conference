@@ -96,8 +96,6 @@ void auth::firebaseLogin(const HttpRequestPtr& req, std::function<void (const Ht
         const std::string firebaseUid = firebaseUser->uid;
         user u = UserRepository::getUserByEmail(email);
         if(u.id==0) throw AppError("User not found", k404NotFound);
-        if(u.provider != provider) throw AppError("Please login with " + u.provider, k400BadRequest);
-        if(!Auth::comparePassword(firebaseUid,u.passwordHash)) throw AppError("Invalid token", k400BadRequest);
         const std::string token=Auth::createToken(u.id,u.role);
         Json::Value response;
         response["token"] = token;
