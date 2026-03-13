@@ -4,7 +4,6 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y \
     build-essential \
-    cmake \
     git \
     curl \
     python3 \
@@ -12,15 +11,16 @@ RUN apt-get update && apt-get install -y \
     pkg-config \
     ninja-build \
     && rm -rf /var/lib/apt/lists/*
+RUN pip3 install cmake
 RUN pip3 install conan
 WORKDIR /app
 COPY conanfile.txt .
 COPY CMakeLists.txt .
 RUN conan profile detect --force
-RUN conan install . --output-folder=build --build=missing -s build_type=Release
+RUN conan install . --output-folder=build --build=missing -s build_type=Release -c tools.system.package_manager:mode=install
 
 COPY src/ src/
-RUN pip3 install cmake
+COPY scripts/ scripts/
 RUN cmake --preset conan-release
 RUN cmake --build --preset conan-release
 
@@ -33,8 +33,8 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 RUN mkdir -p /app/config
-COPY --from=builder /app/build/build/Release/IEEE_Conference_Backend /app/Release/build/IEEE_Conference_Backend
+COPY --from=builder /app/build/IEEE_Conference_Backend /app/build/IEEE_Conference_Backend
 
 EXPOSE 8080
 
-CMD ["/app/Release/build/IEEE_Conference_Backend"]
+CMD ["/app/build/IEEE_Conference_Backend"]
