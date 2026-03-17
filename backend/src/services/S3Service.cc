@@ -65,3 +65,41 @@ bool deleteObject(const std::string& key){
 
     return true;
 }
+
+std::string urlToKey(const std::string& url) {
+    const std::string bucket = requireBucket();
+
+    // remove query params
+    std::string clean = url.substr(0, url.find('?'));
+
+    // remove protocol
+    size_t proto = clean.find("://");
+    if (proto == std::string::npos)
+        throw std::invalid_argument("Invalid URL");
+
+    std::string rest = clean.substr(proto + 3);
+
+    // split host and path
+    size_t slash = rest.find('/');
+    if (slash == std::string::npos)
+        throw std::invalid_argument("Invalid URL path");
+
+    std::string host = rest.substr(0, slash);
+    std::string path = rest.substr(slash + 1); // without leading /
+
+    // CASE 1: virtual hosted style
+    // bucket.s3.amazonaws.com/key
+    if (host.rfind(bucket + ".", 0) == 0) {
+        return path;
+    }
+
+    // CASE 2: path style
+    // s3.amazonaws.com/bucket/key
+    if (path.rfind(bucket + "/", 0) == 0) {
+        return path.substr(bucket.size() + 1);
+    }
+
+    // CASE 3: custom domain or CDN
+    // cdn.example.com/key
+    return path;
+}

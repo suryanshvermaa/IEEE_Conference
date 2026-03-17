@@ -15,10 +15,12 @@ add_executable(IEEE_Conference_Backend
     ./src/controllers/api_v1_users.cc
     ./src/controllers/api_v1_auth.cc
     ./src/controllers/api_v1_notifications.cc
+    ./src/controllers/api_v1_gallery.cc
 
     # # models
     ./src/models/Users.cc
     ./src/models/Notifications.cc
+    ./src/models/Gallery.cc
 
     # filters
     ./src/filters/AuthFilter.cc
@@ -34,6 +36,7 @@ add_executable(IEEE_Conference_Backend
     # repositories
     ./src/repositories/user.repository.cc
     ./src/repositories/notification.repository.cc
+    ./src/repositories/gallery.repository.cc
 
     # main
     ./src/main.cc)

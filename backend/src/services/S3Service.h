@@ -9,3 +9,4 @@
 std::string getSignedUrl(const std::string& key);
 std::string putObjectSignedUrl(const std::string& key);
 bool deleteObject(const std::string& key);
+std::string urlToKey(const std::string& url);
