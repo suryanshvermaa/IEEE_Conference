@@ -14,6 +14,7 @@ servers:
 
 tags:
   - name: Health
+  - name: Auth
   - name: Users
   - name: Notifications
 
@@ -35,9 +36,9 @@ paths:
                     success: true
                     message: heathy
 
-  /api/v1/users/login:
+  /api/v1/auth/login:
     post:
-      tags: [Users]
+      tags: [Auth]
       summary: Login
       requestBody:
         required: true
@@ -70,9 +71,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
-  /api/v1/users/signup:
+  /api/v1/auth/signup:
     post:
-      tags: [Users]
+      tags: [Auth]
       summary: Signup
       requestBody:
         required: true
@@ -89,6 +90,92 @@ paths:
                 $ref: '#/components/schemas/SignupResponse'
         '400':
           description: Validation error / email already in use
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Failed to create user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/auth/firebase/login:
+    post:
+      tags: [Auth]
+      summary: Firebase login
+      description: |
+        Logs in a Firebase-authenticated user.
+        The backend expects an `idToken` from Firebase in the `token` field.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FirebaseAuthRequest'
+            examples:
+              example:
+                value:
+                  token: eyJhbGciOi...
+      responses:
+        '200':
+          description: Firebase login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '400':
+          description: Validation error / invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Invalid Firebase token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/auth/firebase/signup:
+    post:
+      tags: [Auth]
+      summary: Firebase signup
+      description: |
+        Creates a user using Firebase identity.
+        The backend expects an `idToken` from Firebase in the `token` field.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FirebaseAuthRequest'
+            examples:
+              example:
+                value:
+                  token: eyJhbGciOi...
+      responses:
+        '201':
+          description: Firebase signup successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FirebaseSignupResponse'
+        '400':
+          description: Validation error / user already exists / invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Invalid Firebase token
           content:
             application/json:
               schema:
@@ -527,6 +614,14 @@ components:
           type: string
           minLength: 1
 
+    FirebaseAuthRequest:
+      type: object
+      required: [token]
+      properties:
+        token:
+          type: string
+          description: Firebase ID token
+
     AuthUserData:
       type: object
       required: [token, user_id, name, email]
@@ -566,6 +661,32 @@ components:
           example: Signup successful
         data:
           $ref: '#/components/schemas/AuthUserData'
+
+    FirebaseSignupData:
+      type: object
+      required: [token, user_id, email]
+      properties:
+        token:
+          type: string
+          description: JWT token
+        user_id:
+          type: integer
+        email:
+          type: string
+          format: email
+
+    FirebaseSignupResponse:
+      type: object
+      required: [success, message, data]
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Firebase signup successful
+        data:
+          $ref: '#/components/schemas/FirebaseSignupData'
 
     UserPublic:
       type: object
