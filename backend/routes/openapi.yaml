@@ -17,6 +17,7 @@ tags:
   - name: Auth
   - name: Users
   - name: Notifications
+  - name: Gallery
 
 paths:
   /health:
@@ -191,7 +192,12 @@ paths:
     get:
       tags: [Users]
       summary: List users
-      description: Returns a paginated list. `limit` must be between 1 and 20.
+      description: |
+        Returns a paginated list (admin only).
+
+        Note: current implementation rejects `limit >= 20`.
+      security:
+        - bearerAuth: []
       parameters:
         - in: query
           name: page
@@ -204,7 +210,7 @@ paths:
           schema:
             type: integer
             minimum: 1
-            maximum: 20
+            maximum: 19
             default: 10
       responses:
         '200':
@@ -213,6 +219,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UsersListResponse'
+        '401':
+          description: Unauthorized (missing/invalid token or not an admin)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '400':
           description: Invalid request / invalid limit
           content:
@@ -301,7 +313,7 @@ paths:
     delete:
       tags: [Users]
       summary: Delete user by id
-      description: Intended for admin use only (authorization is not enforced in the handler).
+      description: Admin only.
       security:
         - bearerAuth: []
       parameters:
@@ -326,6 +338,210 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
           description: User not found or already deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/users/makeAdmin:
+    post:
+      tags: [Users]
+      summary: Promote current user to admin
+      description: |
+        Admin only.
+
+        As implemented, this endpoint promotes the *current JWT user* (from `AuthFilter`) to role `admin`.
+        It does not accept a target user id.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Role updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessNoData'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: User not found or failed to update role
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/gallery/images:
+    get:
+      tags: [Gallery]
+      summary: List galleries
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            minimum: 1
+            default: 10
+      responses:
+        '200':
+          description: Galleries fetched successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GalleryListResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/gallery/image/{id}:
+    get:
+      tags: [Gallery]
+      summary: Get gallery by id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Gallery fetched successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GalleryGetResponse'
+        '404':
+          description: Gallery not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      tags: [Gallery]
+      summary: Delete gallery image by id
+      description: Admin only.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Gallery deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessNoData'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Gallery not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/gallery/image/signed-url:
+    post:
+      tags: [Gallery]
+      summary: Generate pre-signed upload URL for a gallery image
+      description: Admin only.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GallerySignedUrlRequest'
+      responses:
+        '200':
+          description: Image signed Url generated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GallerySignedUrlResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/gallery/image:
+    post:
+      tags: [Gallery]
+      summary: Create a gallery entry
+      description: Admin only.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GalleryCreateRequest'
+      responses:
+        '200':
+          description: Gallery created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GalleryCreateResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Failed to create gallery
           content:
             application/json:
               schema:
@@ -414,6 +630,7 @@ paths:
     post:
       tags: [Notifications]
       summary: Create notification
+      description: Admin only.
       security:
         - bearerAuth: []
       requestBody:
@@ -482,6 +699,7 @@ paths:
     put:
       tags: [Notifications]
       summary: Update notification
+      description: Admin only.
       security:
         - bearerAuth: []
       parameters:
@@ -526,6 +744,7 @@ paths:
     delete:
       tags: [Notifications]
       summary: Delete notification
+      description: Admin only.
       security:
         - bearerAuth: []
       parameters:
@@ -866,3 +1085,117 @@ components:
           type: string
         priority:
           type: integer
+
+    GalleryItem:
+      type: object
+      required: [id, title, tags, imageUrl]
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        imageUrl:
+          type: string
+          description: Public URL or CDN URL returned by backend
+
+    GalleryItemWithCreatedAt:
+      allOf:
+        - $ref: '#/components/schemas/GalleryItem'
+        - type: object
+          required: [createdAt]
+          properties:
+            createdAt:
+              type: string
+              description: Stored as string by backend
+
+    GalleryListResponse:
+      type: object
+      required: [success, message, data]
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/GalleryItem'
+
+    GalleryGetResponse:
+      type: object
+      required: [success, message, data]
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+        data:
+          $ref: '#/components/schemas/GalleryItemWithCreatedAt'
+
+    GallerySignedUrlRequest:
+      type: object
+      required: [title]
+      properties:
+        title:
+          type: string
+          description: Used as the base filename; backend appends a timestamp
+
+    GallerySignedUrlData:
+      type: object
+      required: [signedUrl]
+      properties:
+        signedUrl:
+          type: string
+          format: uri
+          description: Pre-signed HTTP PUT URL
+
+    GallerySignedUrlResponse:
+      type: object
+      required: [success, message, data]
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+        data:
+          $ref: '#/components/schemas/GallerySignedUrlData'
+
+    GalleryCreateRequest:
+      type: object
+      required: [title, tags, imageObjectKey]
+      properties:
+        title:
+          type: string
+        tags:
+          type: string
+          description: Comma-separated tags (e.g. "tag1,tag2")
+        imageObjectKey:
+          type: string
+          description: S3 object key or full S3/S3-compatible URL
+
+    GalleryCreateData:
+      type: object
+      required: [id]
+      properties:
+        id:
+          type: integer
+          description: Newly created gallery id
+
+    GalleryCreateResponse:
+      type: object
+      required: [success, message, data]
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+        data:
+          $ref: '#/components/schemas/GalleryCreateData'
